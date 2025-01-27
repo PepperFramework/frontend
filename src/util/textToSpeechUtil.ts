@@ -6,16 +6,19 @@ export class TextToSpeechUtil {
     /**
      * Convert text to speech and get the MP3 data as an ArrayBuffer.
      * @param text The text to convert to speech.
+     * @param language
      * @returns A Promise resolving to the MP3 data as an ArrayBuffer.
      */
-    public static async getMp3Data(text: string): Promise<ArrayBuffer> {
+    public static async getMp3Data(text: string, language?: string): Promise<ArrayBuffer> {
         try {
+            if (language == undefined) {
+                language = "en";
+            }
+
             const payload = {
                 model: "tts-1",
                 input: text,
-                voice: (MenuManager.getInstance().getLan() == "de") ? "thorsten-emotionally-amused" : "alloy",
-                //thorsten-emotionally-amused <- deutsche voice
-                //alloy                       <- englische voice
+                voice: (language == "de") ? "thorsten-emotionally-amused" : "alloy",
                 response_format: "mp3",
                 speed: 0.8,
             };

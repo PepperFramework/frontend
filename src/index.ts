@@ -10,6 +10,7 @@ import {MenuManager} from "./util/menuManager";
 let can : CanvasUtil;
 let theforgroundchat : HTMLElement;
 let chatUtils : ChatUtil;
+let language : string;
 
 document.addEventListener("DOMContentLoaded", async () => {
     can = CanvasUtil.getInstance();
@@ -32,6 +33,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         //QuestionHandler.getInstance().AIInUse = settings[0].aiInUse
         //await startSpeechRecognition(settings[0].language);
         //console.log(settings[0])
+
+        language = settings.language;
     }
     setTimeout(() => {can.drawACoolBackground(); can.drawText(); can.drawMenuIcon();}, 150);
 
@@ -100,8 +103,27 @@ function work() {
         let res = await QuestionHandler.getInstance().getAnswerFromAi(result);
         chatUtils.addMessage(res);
 
-        TextToSpeechUtil.getMp3Data(res).then((data) => {
+        //delete before release
+        console.log(res);
+        console.log(language);
+        // /delete before release
+
+        //check the length of the response and if its to long, split it into multiple parts
+        if (res.length > 1000) {
+            let split = res.match(/.{1,1000}/g);
+            for (let i = 0; i < split.length; i++) {
+                TextToSpeechUtil.getMp3Data(split[i], language).then((data) => {
+                    can.renderBars(data);
+                });
+            }
+        } else {
+            TextToSpeechUtil.getMp3Data(res, language).then((data) => {
+                can.renderBars(data);
+            });
+        }
+
+        /*TextToSpeechUtil.getMp3Data(res).then((data) => {
             can.renderBars(data);
-        });
+        });*/
     });
 }
